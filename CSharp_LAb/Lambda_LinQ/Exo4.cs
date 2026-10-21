@@ -1,18 +1,5 @@
 ﻿namespace CSharp_LAb;
 
-/*
- * Afficher les noms des employés de plus de 35 ans, triés par âge décroissant.
-Afficher le salaire moyen de l’entreprise (Average).
-Afficher la liste des services, sans doublon (Select puis Distinct).
-Afficher, pour chaque service, le salaire moyen.
-Afficher les trois employés les mieux payés (noms et salaires), avec Take(3).
-Afficher, pour chaque service, le nom de l’employé le mieux payé (MaxBy dans chaque groupe).
-
-Y a-t-il au moins un employé de plus de 50 ans ? (Any)
-Tous les employés gagnent-ils plus de 2500 € ? (All)
-Afficher les services dont le salaire moyen dépasse 3500 €, avec leur effectif, triés par salaire moyen décroissant. Format attendu : Finance : 3 employés, moyenne 4200.
- */
-
 public record Employe(string Nom, string Service, int Age, decimal Salaire, int Anciennete);
 
 public class Exo4
@@ -33,6 +20,9 @@ public class Exo4
 
   public static void Run()
   {
+    //1. Afficher les noms des employés de plus de 35 ans, triés par âge décroissant.
+    Console.WriteLine("1. Afficher les noms des employés de plus de 35 ans, triés par âge décroissant.");
+
     var moreThanThirtyFive = employes.Where(e => e.Age > 35)
       .OrderByDescending(e => e.Age)
       .Select(e => e.Age);
@@ -44,16 +34,25 @@ public class Exo4
 
     Console.WriteLine("----------------------------------------------------------------------------------");
 
+    //2. Afficher le salaire moyen de l’entreprise (Average).
+    Console.WriteLine("2. Afficher le salaire moyen de l’entreprise (Average).");
+
     var salaryAverage = employes.Select(e => e.Salaire).Average();
     Console.WriteLine(salaryAverage);
 
     Console.WriteLine("----------------------------------------------------------------------------------");
+
+    //3. Afficher la liste des services, sans doublon (Select puis Distinct).
+    Console.WriteLine("3. Afficher la liste des services, sans doublon (Select puis Distinct)");
 
     var services = employes.Select(e => e.Service).Distinct();
 
     Console.WriteLine(string.Join(", ", services));
 
     Console.WriteLine("----------------------------------------------------------------------------------");
+
+    //4. Afficher, pour chaque service, le salaire moyen.
+    Console.WriteLine("4. Afficher, pour chaque service, le salaire moyen.");
 
     var salaryAverageByService = employes.GroupBy(e => e.Service);
 
@@ -64,6 +63,9 @@ public class Exo4
 
     Console.WriteLine("----------------------------------------------------------------------------------");
 
+    //5. Afficher les trois employés les mieux payés (noms et salaires), avec Take(3).
+    Console.WriteLine("5. Afficher les trois employés les mieux payés (noms et salaires), avec Take(3).");
+
     var highestPaid = employes.OrderByDescending(e => e.Salaire).ToList().Take(3);
 
     foreach (var employee in highestPaid)
@@ -73,6 +75,9 @@ public class Exo4
 
     Console.WriteLine("----------------------------------------------------------------------------------");
 
+    //6. Afficher, pour chaque service, le nom de l’employé le mieux payé (MaxBy dans chaque groupe).
+    Console.WriteLine("6. Afficher, pour chaque service, le nom de l’employé le mieux payé (MaxBy dans chaque groupe).");
+
     var topSalaryByService = employes.GroupBy(e => e.Service);
 
     foreach (var groupe in topSalaryByService)
@@ -80,9 +85,12 @@ public class Exo4
       var meilleur = groupe.MaxBy(e => e.Salaire);
       Console.WriteLine($"{groupe.Key} : {meilleur.Nom} : {meilleur.Salaire}");
     }
-    
+
     Console.WriteLine("----------------------------------------------------------------------------------");
-    
+
+    //7. Y a-t-il au moins un employé de plus de 50 ans ? (Any)
+    Console.WriteLine("7. Y a-t-il au moins un employé de plus de 50 ans ? (Any)");
+
     bool find = employes.Any(e => e.Age > 50);
 
     if (find)
@@ -93,9 +101,12 @@ public class Exo4
     {
       Console.WriteLine($"Pas trouvé");
     }
-    
+
     Console.WriteLine("----------------------------------------------------------------------------------");
-    
+
+    //8. Tous les employés gagnent-ils plus de 2500 € ? (All)
+    Console.WriteLine("8. Tous les employés gagnent-ils plus de 2500 € ? (All)");
+
     bool salary = employes.All(e => e.Salaire > 2500);
     if (salary)
     {
@@ -105,12 +116,13 @@ public class Exo4
     {
       Console.WriteLine($"{salary} : non");
     }
-    
+
     Console.WriteLine("----------------------------------------------------------------------------------");
-    
-    //Afficher les services dont le salaire moyen dépasse 3500 €, avec leur effectif, triés par salaire moyen décroissant.
+
+    //9. Afficher les services dont le salaire moyen dépasse 3500 €, avec leur effectif, triés par salaire moyen décroissant.
     //Format attendu : Finance : 3 employés, moyenne 4200.
-    
+    Console.WriteLine("9. Afficher les services dont le salaire moyen dépasse 3500 €, avec leur effectif, triés par salaire moyen décroissant.\n Format attendu : Finance : 3 employés, moyenne 4200.");
+
     var topService = employes.GroupBy(e => e.Service)
       .Where(g => g.Average(e => e.Salaire) > 3500).OrderByDescending(g => g.Average(e => e.Salaire));
 

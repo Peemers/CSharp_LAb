@@ -3,9 +3,10 @@
 while (true)
 {
   Console.WriteLine("Quel exo voulez vous lancer ?");
-  Console.WriteLine("Lambda_LinQ, tapez : 1, 2, 3, 4, 5, 6, 7 (recap)");
+  Console.WriteLine("Lambda_LinQ : tapez : 1, 2, 3, 4, 5, 6, 7 (recap)");
   Console.WriteLine("q pour quitter");
   var choix = Console.ReadLine();
+  Console.Clear();
 
   switch (choix)
   {
@@ -18,4 +19,6 @@ while (true)
     case "7": Recap.Run(); break;
     case "q" : return ;
   }
+
+  Console.WriteLine("-------------------------------------------------");
 }

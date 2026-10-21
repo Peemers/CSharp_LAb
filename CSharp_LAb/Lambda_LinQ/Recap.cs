@@ -37,56 +37,95 @@ public class Recap
   {
     //Partie 1 : les étudiants seuls
     
-    //Afficher les noms des étudiants de plus de 20 ans, triés par âge décroissant.
-    //Afficher les filières, sans doublon.
-    //Afficher les trois étudiants les plus âgés.
+    //1.1 Afficher les noms des étudiants de plus de 20 ans, triés par âge décroissant.
+    Console.WriteLine("1.1 Afficher les noms des étudiants de plus de 20 ans, triés par âge décroissant.");
+
+    var studentAbove20 = etudiants
+      .Where(e => e.Age > 20)
+      .OrderByDescending(e => e.Age)
+      .Select(e => e.Nom);
+
+    foreach (var student in studentAbove20)
+    {
+      Console.WriteLine($"{student}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+    
+    //1.2 Afficher les filières, sans doublon.
+    Console.WriteLine("1.2 Afficher les filières, sans doublon.");
+
+    var Sectors = etudiants
+      .Select(e => e.Filiere)
+      .Distinct();
+
+    foreach (var sector in Sectors)
+    {
+      Console.WriteLine($"{sector}");
+    }
+    
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+    
+    //1.3 Afficher les trois étudiants les plus âgés.
+    Console.WriteLine("1.3 Afficher les trois étudiants les plus âgés.");
+
+    var oldestStudent = etudiants
+      .OrderByDescending(e => e.Age)
+      .Take(3)
+      .Select(e => new {e.Nom, e.Age});
+
+    foreach (var student in oldestStudent)
+    {
+      Console.WriteLine($"{student.Age} {student.Nom}");
+    }
+    
     //Y a-t-il un étudiant de moins de 20 ans ? Tous les étudiants ont-ils plus de 18 ans ?
     //Afficher le nombre d’étudiants par filière.
     //Afficher l’âge moyen par filière.
-    
+
     //Partie 2 : les notes seules
-    
+
     //Afficher la moyenne générale de toutes les notes (arrondie à 2 décimales).
     //Afficher les notes supérieures ou égales à 15, avec leur matière, de la plus haute à la plus basse.
     //Afficher les matières, sans doublon.
     //Afficher la moyenne par matière.
     //Afficher la matière qui a la meilleure moyenne.
     //Y a-t-il une note de 20 ? Toutes les notes sont-elles supérieures ou égales à 7 ?
-    
+
     //Partie 3 : relier avec Join
-    
+
     //Afficher, pour chaque note, le nom de l’étudiant, la matière et la valeur.
     //Afficher la moyenne par étudiant, de la plus haute à la plus basse.
     //Afficher la moyenne des notes par filière, de la plus haute à la plus basse.
     //Afficher, pour chaque matière, le nom de l’étudiant qui a la meilleure note et cette note.
     //Afficher les trois meilleures notes, avec le nom de l’étudiant et la matière.
-    
+
     //Partie 4 : lambdas imbriquées
-    
+
     //Afficher les étudiants qui n’ont aucune note.
     //Afficher tous les étudiants avec leur nombre de notes (Gaëlle doit apparaître avec 0), du plus grand nombre au plus petit.
     //Afficher les étudiants qui ont au moins une note inférieure à 10.
-    
+
     //Partie 5 : SelectMany et doublons (sur la liste commentaires)
-    
+
     //Afficher tous les mots des commentaires, puis les mots sans doublon.
     //Afficher les mots qui apparaissent plusieurs fois (c’est la toute première fonction de notre conversation).
     //Afficher le mot le plus fréquent avec son nombre d’apparitions.
-    
+
     //Partie 6 : stocker une lambda dans une variable
-    
+
     //Écris une Func<decimal, string> nommée mention qui renvoie :
     //"Insuffisant" si la note est inférieure à 10,
     //"Passable" si elle est inférieure à 14,
     //"Bien" si elle est inférieure à 16,
     //"Très bien" sinon.
     //Utilise-la pour afficher, pour chaque étudiant qui a des notes, sa moyenne et sa mention.
-    
+
     //Défis
-    
+
     //Afficher les noms de tous les étudiants de la filière qui a la meilleure moyenne de notes (celle de la question 15), triés par nom, y compris ceux sans note. Ça se fait en deux temps : d’abord la filière, ensuite les étudiants.
     //Afficher, pour chaque filière, le nom de l’étudiant qui a la meilleure moyenne. Tu devras calculer des moyennes par étudiant, puis regrouper par filière.
-    
+
     //De quoi vérifier
     //1 : Emma, Bob, Chloé, Gaëlle (dans cet ordre).
     //5 : Info 3, Maths 2, Physique 2. 6 : Info 21, Maths 20, Physique 21,5.

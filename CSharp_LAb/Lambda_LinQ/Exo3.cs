@@ -1,13 +1,5 @@
 ﻿namespace CSharp_LAb;
 
-/*Afficher les noms des produits en rupture de stock (Stock == 0).
-Afficher les produits à moins de 50 €, du moins cher au plus cher.
-Afficher le produit le plus cher.
-Afficher le prix moyen de tous les produits (indice : Average).
-Afficher, pour chaque catégorie, le nombre de produits.
-Afficher, pour chaque catégorie, la valeur totale du stock (prix fois quantité, additionné sur la catégorie).
-Défi : afficher les noms des produits disponibles (stock > 0) de la catégorie qui a la plus grande valeur de stock, triés par nom.*/
-
 public record Produit(string Nom, string Categorie, decimal Prix, int Stock);
 
 public class Exo3
@@ -26,6 +18,9 @@ public class Exo3
 
   public static void Run()
   {
+    //1. afficher les noms des produits en rupture de stock (Stock == 0).
+    Console.WriteLine("1. Afficher les noms des produits en rupture de stock (Stock == 0).");
+
     var rupture = produits.Where(p => p.Stock == 0)
       .OrderBy(p => p.Nom);
 
@@ -35,6 +30,9 @@ public class Exo3
     }
 
     Console.WriteLine("---------------------------------------------------------------------------");
+
+    //2. afficher les produits à moins de 50 €, du moins cher au plus cher.
+    Console.WriteLine("2. Afficher les produits à moins de 50 €, du moins cher au plus cher.");
 
     var underFifthy = produits.Where(p => p.Prix < 50)
       .OrderBy(p => p.Prix);
@@ -46,6 +44,9 @@ public class Exo3
 
     Console.WriteLine("---------------------------------------------------------------------------");
 
+    //3. afficher le produit le plus cher.
+    Console.WriteLine("3. Afficher le produit le plus cher.");
+
     var expensive = produits.OrderByDescending(p => p.Prix)
       .First();
 
@@ -53,11 +54,17 @@ public class Exo3
 
     Console.WriteLine("---------------------------------------------------------------------------");
 
+    //4. afficher le prix moyen de tous les produits (indice : Average).
+    Console.WriteLine("4. Afficher le prix moyen de tous les produits (indice : Average).");
+
     var averagePrice = produits.Average(p => p.Prix);
 
     Console.WriteLine(averagePrice);
 
     Console.WriteLine("---------------------------------------------------------------------------");
+
+    //5. afficher, pour chaque catégorie, le nombre de produits.
+    Console.WriteLine("5. Afficher, pour chaque catégorie, le nombre de produits.");
 
     var catStock = produits.GroupBy(p => p.Categorie);
 
@@ -68,6 +75,9 @@ public class Exo3
 
     Console.WriteLine("---------------------------------------------------------------------------");
 
+    //6. afficher, pour chaque catégorie, la valeur totale du stock (prix fois quantité, additionné sur la catégorie).
+    Console.WriteLine("6. Afficher, pour chaque catégorie, la valeur totale du stock (prix fois quantité, additionné sur la catégorie).");
+
     var valueCatStock = produits.GroupBy(p => p.Categorie);
 
     foreach (var group in valueCatStock)
@@ -77,7 +87,8 @@ public class Exo3
 
     Console.WriteLine("---------------------------------------------------------------------------");
 
-    //Défi : afficher les noms des produits disponibles (stock > 0) de la catégorie qui a la plus grande valeur de stock, triés par nom.
+    //7. défi : afficher les noms des produits disponibles (stock > 0) de la catégorie qui a la plus grande valeur de stock, triés par nom.
+    Console.WriteLine("7. Défi : afficher les noms des produits disponibles (stock > 0) de la catégorie qui a la plus grande valeur de stock, triés par noma");
 
     var bestCategory = produits.GroupBy(p => p.Categorie)
       .MaxBy(g => g.Sum(p => p.Prix * p.Stock));

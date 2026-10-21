@@ -29,23 +29,18 @@ public class Exo5
     new Commande(10, 5, "Clavier", 49.90m, new DateOnly(2026, 6, 1)),
   };
 
-  /*
-Afficher le total dépensé par client (nom et total), trié du plus dépensier au moins dépensier.
-Afficher le total dépensé par ville.
-Afficher les clients qui n’ont passé aucune commande. Ici, pas besoin de Join : pense à Any à l’intérieur d’un Where, en comparant les identifiants.
-Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doublon, puis le mot le plus fréquent (GroupBy, puis MaxBy sur Count()).
-(défis)Afficher tous les clients, y compris David, avec leur nombre de commandes, trié par nombre décroissant. David doit apparaître avec 0.
-   */
 
   public static void Run()
   {
-    //Afficher le montant total de toutes les commandes (Sum).
+    //1. Afficher le montant total de toutes les commandes (Sum).
+    Console.WriteLine("1. Afficher le montant total de toutes les commandes (Sum).");
     var sumAll = commandes.Sum(c => c.Montant);
     Console.WriteLine($"Total montant: {sumAll}");
 
     Console.WriteLine("-----------------------------------------------------------------");
 
-    //Afficher les commandes de plus de 100 €, triées par montant décroissant (produit et montant).
+    //2. Afficher les commandes de plus de 100 €, triées par montant décroissant (produit et montant).
+    Console.WriteLine("2. Afficher les commandes de plus de 100 €, triées par montant décroissant (produit et montant).");
     var moreThan100 = commandes.Where(c => c.Montant > 100)
       .OrderByDescending(c => c.Montant);
 
@@ -56,7 +51,8 @@ Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doubl
 
     Console.WriteLine("-----------------------------------------------------------------");
 
-    //Afficher, pour chaque produit, le nombre de commandes
+    //3. Afficher, pour chaque produit, le nombre de commandes.
+    Console.WriteLine("3. Afficher, pour chaque produit, le nombre de commandes.");
     var nbOfCommand = commandes.GroupBy(c => c.Produit);
 
     foreach (var item in nbOfCommand)
@@ -66,7 +62,8 @@ Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doubl
 
     Console.WriteLine("-----------------------------------------------------------------");
 
-    //Afficher, pour chaque commande, le nom du client et le produit (Join).
+    //4. Afficher, pour chaque commande, le nom du client et le produit (Join).
+    Console.WriteLine("4. Afficher, pour chaque commande, le nom du client et le produit (Join).");
     var commandesAvecClient = commandes.Join(
       clients,
       commande => commande.ClientId,
@@ -80,7 +77,8 @@ Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doubl
 
     Console.WriteLine("-----------------------------------------------------------------");
 
-    //Afficher le total dépensé par client (nom et total), trié du plus dépensier au moins dépensier.
+    //5. Afficher le total dépensé par client (nom et total), trié du plus dépensier au moins dépensier.
+    Console.WriteLine("5. Afficher le total dépensé par client (nom et total), trié du plus dépensier au moins dépensier.");
 
     var totalDispensePerCustomer = clients
       .Join(
@@ -99,7 +97,8 @@ Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doubl
 
     Console.WriteLine("-----------------------------------------------------------------");
 
-    //Afficher le total dépensé par ville.
+    //6. Afficher le total dépensé par ville.
+    Console.WriteLine("6. Afficher le total dépensé par ville.");
 
     var totalDispensePerCity = clients
       .Join(
@@ -118,7 +117,8 @@ Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doubl
 
     Console.WriteLine("-----------------------------------------------------------------");
 
-    //Afficher les clients qui n’ont passé aucune commande. Ici, pas besoin de Join : pense à Any à l’intérieur d’un Where, en comparant les identifiants.
+    //7. Afficher les clients qui n’ont passé aucune commande. Ici, pas besoin de Join : pense à Any à l’intérieur d’un Where, en comparant les identifiants.
+    Console.WriteLine("7. Afficher les clients qui n’ont passé aucune commande. Ici, pas besoin de Join : pense à Any à l’intérieur d’un Where, en comparant les identifiants.");
 
     var poorClient = clients
       .Where(c => !commandes.Any(commande => commande.ClientId == c.Id)!);
@@ -130,7 +130,8 @@ Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doubl
 
     Console.WriteLine("-----------------------------------------------------------------");
 
-    //Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doublon, puis le mot le plus fréquent (GroupBy, puis MaxBy sur Count()).
+    //8. Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doublon, puis le mot le plus fréquent (GroupBy, puis MaxBy sur Count()).
+    Console.WriteLine("8. Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doublon, puis le mot le plus fréquent (GroupBy, puis MaxBy sur Count()).");
 
     var phrases = new List<string> { "le chat dort", "le chien court", "le chat mange" };
 
@@ -147,10 +148,11 @@ Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doubl
       .GroupBy(m => m)
       .MaxBy(g => g.Count());
     Console.WriteLine($"{plusFrequent.Key} : {plusFrequent.Count()} fois");
-    
+
     Console.WriteLine("-----------------------------------------------------------------");
-    
-    //(défis) Afficher tous les clients, y compris David, avec leur nombre de commandes, trié par nombre décroissant. David doit apparaître avec 0.
+
+    //9. (défis) Afficher tous les clients, y compris David, avec leur nombre de commandes, trié par nombre décroissant. David doit apparaître avec 0.
+    Console.WriteLine("9. (défis) Afficher tous les clients, y compris David, avec leur nombre de commandes, trié par nombre décroissant. David doit apparaître avec 0.");
 
     var allClients = clients
       .Select(c => new
@@ -164,9 +166,5 @@ Afficher tous les mots (avec SelectMany et Split(' ')), puis les mots sans doubl
     {
       Console.WriteLine($"{item.Nom} : {item.NbCommandes}");
     }
-    
-    Console.WriteLine("-----------------------------------------------------------------");
-    
-    
   }
 }

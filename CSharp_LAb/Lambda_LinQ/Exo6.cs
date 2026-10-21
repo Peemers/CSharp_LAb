@@ -28,7 +28,8 @@ public class Exo6
 
   public static void Run()
   {
-    //Afficher, pour chaque livre, son titre et le nom de son auteur (Join).
+    //1. Afficher, pour chaque livre, son titre et le nom de son auteur (Join).
+    Console.WriteLine("1. Afficher, pour chaque livre, son titre et le nom de son auteur (Join).");
 
     var bookAuthor = auteurs.Join(
       livres,
@@ -43,7 +44,8 @@ public class Exo6
 
     Console.WriteLine("-----------------------------------------------------------------------------------");
 
-    //Afficher les livres à plus de 8 €, avec le nom de l’auteur.
+    //2. Afficher les livres à plus de 8 €, avec le nom de l’auteur.
+    Console.WriteLine("2. Afficher les livres à plus de 8 €, avec le nom de l’auteur.");
 
     var priceBookAuthor = auteurs.Join(
       livres.Where(l => l.Prix > 8),
@@ -58,7 +60,8 @@ public class Exo6
 
     Console.WriteLine("-----------------------------------------------------------------------------------");
 
-    //Afficher le titre, l’auteur et le pays de chaque livre, triés par année de publication (du plus ancien au plus récent).
+    //3. Afficher le titre, l’auteur et le pays de chaque livre, triés par année de publication (du plus ancien au plus récent).
+    Console.WriteLine("3. Afficher le titre, l’auteur et le pays de chaque livre, triés par année de publication (du plus ancien au plus récent).");
 
     var publicationDateAndCountry = livres.Join(
         auteurs,
@@ -74,7 +77,8 @@ public class Exo6
 
     Console.WriteLine("-----------------------------------------------------------------------------------");
 
-    //Afficher les titres des livres écrits par des auteurs français.
+    //4. Afficher les titres des livres écrits par des auteurs français.
+    Console.WriteLine("4. Afficher les titres des livres écrits par des auteurs français.");
 
     var frenchAuthor = auteurs.Where(a => a.Pays == "France").Join(
       livres,
@@ -89,7 +93,8 @@ public class Exo6
     
     Console.WriteLine("-----------------------------------------------------------------------------------");
     
-    //la question 1 refaite avec livres.Join(auteurs, ...). Compare l’ordre d’affichage avec ta version actuelle.
+    //5. la question 1 refaite avec livres.Join(auteurs, ...). Compare l’ordre d’affichage avec ta version actuelle.
+    Console.WriteLine("5. la question 1 refaite avec livres.Join(auteurs, ...). Compare l’ordre d’affichage avec ta version actuelle.");
 
     var authorBook2 = livres.Join(
       auteurs,
