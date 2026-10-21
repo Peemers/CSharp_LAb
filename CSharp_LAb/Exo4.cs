@@ -108,6 +108,15 @@ public class Exo4
     
     Console.WriteLine("----------------------------------------------------------------------------------");
     
+    //Afficher les services dont le salaire moyen dépasse 3500 €, avec leur effectif, triés par salaire moyen décroissant.
+    //Format attendu : Finance : 3 employés, moyenne 4200.
     
+    var topService = employes.GroupBy(e => e.Service)
+      .Where(g => g.Average(e => e.Salaire) > 3500).OrderByDescending(g => g.Average(e => e.Salaire));
+
+    foreach (var groupe in topService)
+    {
+      Console.WriteLine($"{groupe.Key} : {groupe.Count()} employés, moyenne {groupe.Average(e => e.Salaire):F2}");
+    }
   }
 }
