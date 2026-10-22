@@ -1,29 +1,32 @@
-﻿namespace CSharp_LAb;
+﻿using System.Reflection;
+
+namespace CSharp_LAb;
 
 public record Etudiant(int Id, string Nom, string Filiere, int Age);
+
 public record Note(int EtudiantId, string Matiere, decimal Valeur);
 
 public class Recap
 {
   private static List<Etudiant> etudiants = new()
   {
-    new Etudiant(1, "Alice",  "Info",     20),
-    new Etudiant(2, "Bob",    "Info",     22),
-    new Etudiant(3, "Chloé",  "Maths",    21),
-    new Etudiant(4, "David",  "Maths",    19),
-    new Etudiant(5, "Emma",   "Physique", 23),
-    new Etudiant(6, "Farid",  "Physique", 20),
-    new Etudiant(7, "Gaëlle", "Info",     21),
+    new Etudiant(1, "Alice", "Info", 20),
+    new Etudiant(2, "Bob", "Info", 22),
+    new Etudiant(3, "Chloé", "Maths", 21),
+    new Etudiant(4, "David", "Maths", 19),
+    new Etudiant(5, "Emma", "Physique", 23),
+    new Etudiant(6, "Farid", "Physique", 20),
+    new Etudiant(7, "Gaëlle", "Info", 21),
   };
 
   private static List<Note> notes = new()
   {
     new Note(1, "Maths", 15m), new Note(1, "Info", 18m), new Note(1, "Physique", 12m),
-    new Note(2, "Maths", 9m),  new Note(2, "Info", 14m),
+    new Note(2, "Maths", 9m), new Note(2, "Info", 14m),
     new Note(3, "Maths", 17m), new Note(3, "Info", 11m), new Note(3, "Physique", 16m),
-    new Note(4, "Maths", 8m),  new Note(4, "Physique", 10m),
+    new Note(4, "Maths", 8m), new Note(4, "Physique", 10m),
     new Note(5, "Maths", 13m), new Note(5, "Physique", 19m),
-    new Note(6, "Info", 7m),   new Note(6, "Physique", 12m),
+    new Note(6, "Info", 7m), new Note(6, "Physique", 12m),
   };
 
   private static List<string> commentaires = new()
@@ -36,7 +39,7 @@ public class Recap
   public static void Run()
   {
     //Partie 1 : les étudiants seuls
-    
+
     //1.1 Afficher les noms des étudiants de plus de 20 ans, triés par âge décroissant.
     Console.WriteLine("1.1 Afficher les noms des étudiants de plus de 20 ans, triés par âge décroissant.");
 
@@ -51,7 +54,7 @@ public class Recap
     }
 
     Console.WriteLine("--------------------------------------------------------------------------------------------");
-    
+
     //1.2 Afficher les filières, sans doublon.
     Console.WriteLine("1.2 Afficher les filières, sans doublon.");
 
@@ -63,48 +66,270 @@ public class Recap
     {
       Console.WriteLine($"{sector}");
     }
-    
+
     Console.WriteLine("--------------------------------------------------------------------------------------------");
-    
+
     //1.3 Afficher les trois étudiants les plus âgés.
     Console.WriteLine("1.3 Afficher les trois étudiants les plus âgés.");
 
     var oldestStudent = etudiants
       .OrderByDescending(e => e.Age)
       .Take(3)
-      .Select(e => new {e.Nom, e.Age});
+      .Select(e => new { e.Nom, e.Age });
 
     foreach (var student in oldestStudent)
     {
       Console.WriteLine($"{student.Age} {student.Nom}");
     }
-    
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
     //Y a-t-il un étudiant de moins de 20 ans ? Tous les étudiants ont-ils plus de 18 ans ?
+    Console.WriteLine("Y a-t-il un étudiant de moins de 20 ans ? Tous les étudiants ont-ils plus de 18 ans ?");
+
+    var isAdult = etudiants.All(e => e.Age > 18);
+    var isTwenty = etudiants.Any(e => e.Age < 20);
+
+    Console.WriteLine(isTwenty ? "oui" : "non");
+    Console.WriteLine(isAdult ? "oui" : "non");
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
     //Afficher le nombre d’étudiants par filière.
+    Console.WriteLine("Afficher le nombre d’étudiants par filière.");
+
+    var studentPerSector = etudiants.GroupBy(e => e.Filiere);
+
+    foreach (var student in studentPerSector)
+    {
+      Console.WriteLine($"{student.Key} : {student.Count()}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
     //Afficher l’âge moyen par filière.
+    Console.WriteLine("Afficher l’âge moyen par filière.");
+
+    var averagePerSector = etudiants.GroupBy(e => e.Filiere);
+
+    foreach (var student in averagePerSector)
+    {
+      Console.WriteLine($"{student.Key} : {student.Average(s => s.Age)}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
 
     //Partie 2 : les notes seules
 
-    //Afficher la moyenne générale de toutes les notes (arrondie à 2 décimales).
-    //Afficher les notes supérieures ou égales à 15, avec leur matière, de la plus haute à la plus basse.
-    //Afficher les matières, sans doublon.
-    //Afficher la moyenne par matière.
-    //Afficher la matière qui a la meilleure moyenne.
-    //Y a-t-il une note de 20 ? Toutes les notes sont-elles supérieures ou égales à 7 ?
+    //2.1 Afficher la moyenne générale de toutes les notes (arrondie à 2 décimales).
+    Console.WriteLine("Afficher la moyenne générale de toutes les notes (arrondie à 2 décimales).");
+
+    var averageScore = notes.Average(n => n.Valeur);
+
+    Console.WriteLine($"{averageScore:F2}");
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //2.2 Afficher les notes supérieures ou égales à 15, avec leur matière, de la plus haute à la plus basse.
+    Console.WriteLine("2.2 Afficher les notes supérieures ou égales à 15, avec leur matière, de la plus haute à la plus basse.");
+
+    var upper15 = notes.Where(n => n.Valeur >= 15).OrderByDescending(n => n.Valeur);
+
+    foreach (var note in upper15)
+    {
+      Console.WriteLine($"{note.Valeur} - {note.Matiere}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //2.3 Afficher les matières, sans doublon.
+    Console.WriteLine("2.3 Afficher les matières, sans doublon.");
+
+    var noDouble = notes.Select(n => n.Matiere).Distinct();
+
+    foreach (var note in noDouble)
+    {
+      Console.WriteLine($"{note}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //2.4 Afficher la moyenne par matière.
+    Console.WriteLine("2.4 Afficher la moyenne par matière.");
+
+    var averagePerSubject = notes.GroupBy(n => n.Matiere);
+
+    foreach (var note in averagePerSubject)
+    {
+      Console.WriteLine($"{note.Key} - {note.Average(n => n.Valeur)}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //2.1 Afficher la matière qui a la meilleure moyenne.
+    Console.WriteLine("2.5 Afficher la matière qui a la meilleure moyenne.");
+
+    var topSectorAverage = notes.GroupBy(n => n.Matiere)
+      .MaxBy(g => g.Average(n => n.Valeur));
+
+    Console.WriteLine($"{topSectorAverage.Key} - {topSectorAverage.Average(n => n.Valeur)}");
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //2.2 Y a-t-il une note de 20 ? Toutes les notes sont-elles supérieures ou égales à 7 ?
+    Console.WriteLine("Y a-t-il une note de 20 ? Toutes les notes sont-elles supérieures ou égales à 7 ?");
+
+    var isAllAbove7 = notes.All(n => n.Valeur >= 7);
+    var isMaxScore = notes.Any(n => n.Valeur == 20);
+
+    Console.WriteLine($"Note à 20 : {(isMaxScore ? "oui" : "non")}");
+    Console.WriteLine($"Tout le monde au dessus de 7 : {(isAllAbove7 ? "oui" : "non")}");
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
 
     //Partie 3 : relier avec Join
 
-    //Afficher, pour chaque note, le nom de l’étudiant, la matière et la valeur.
-    //Afficher la moyenne par étudiant, de la plus haute à la plus basse.
-    //Afficher la moyenne des notes par filière, de la plus haute à la plus basse.
-    //Afficher, pour chaque matière, le nom de l’étudiant qui a la meilleure note et cette note.
-    //Afficher les trois meilleures notes, avec le nom de l’étudiant et la matière.
+    //3.1 Afficher, pour chaque note, le nom de l’étudiant, la matière et la valeur.
+    Console.WriteLine("3.1 Afficher, pour chaque note, le nom de l’étudiant, la matière et la valeur.");
+
+    var gradePerStudent = notes.Join(
+      etudiants,
+      note => note.EtudiantId,
+      etudiant => etudiant.Id,
+      ((note, etudiant) => new { note.Valeur, etudiant.Nom, note.Matiere }));
+
+    foreach (var grade in gradePerStudent)
+    {
+      Console.WriteLine($"{grade.Valeur} - {grade.Nom} - {grade.Matiere}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //3.2 Afficher la moyenne par étudiant, de la plus haute à la plus basse.
+    Console.WriteLine("3.2 Afficher la moyenne par étudiant, de la plus haute à la plus basse.");
+
+    var averageNote = notes.Join(
+        etudiants,
+        note => note.EtudiantId,
+        etudiant => etudiant.Id,
+        (note, etudiant) => new { etudiant.Nom, note.Valeur, note.Matiere })
+      .GroupBy(nn => nn.Nom)
+      .Select(g => new { Nom = g.Key, Valeur = g.Average(n => n.Valeur) })
+      .OrderByDescending(n => n.Valeur);
+
+    foreach (var note in averageNote)
+    {
+      Console.WriteLine($"{note.Valeur:F2} - {note.Nom}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //3.3 Afficher la moyenne des notes par filière, de la plus haute à la plus basse.
+    Console.WriteLine("3.3 Afficher la moyenne des notes par filière, de la plus haute à la plus basse.");
+
+    var averagePerSector2 = notes.Join(
+        etudiants,
+        note => note.EtudiantId,
+        etudiant => etudiant.Id,
+        (note, etudiant) => new { etudiant.Filiere, note.Valeur })
+      .GroupBy(fv => fv.Filiere)
+      .Select(g => new { Filiere = g.Key, Valeur = g.Average(n => n.Valeur) })
+      .OrderByDescending(n => n.Valeur);
+
+    foreach (var note in averagePerSector2)
+    {
+      Console.WriteLine($"{note.Valeur} {note.Filiere}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //3.4 Afficher, pour chaque matière, le nom de l’étudiant qui a la meilleure note et cette note.
+    Console.WriteLine("3.4 Afficher, pour chaque matière, le nom de l’étudiant qui a la meilleure note et cette note.");
+
+    var topSectorStudent = notes.Join(
+        etudiants,
+        note => note.EtudiantId,
+        etudiant => etudiant.Id,
+        (note, etudiant) => new { etudiant.Nom, note.Matiere, note.Valeur })
+      .GroupBy(nm => nm.Matiere)
+      .Select(g => new { Matiere = g.Key, Meilleure = g.MaxBy(n => n.Valeur) });
+
+    foreach (var note in topSectorStudent)
+    {
+      Console.WriteLine($"{note.Meilleure.Nom} {note.Matiere} {note.Meilleure.Valeur}");
+    }
+    
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //3.5 Afficher les trois meilleures notes, avec le nom de l’étudiant et la matière.
+    Console.WriteLine("3.5 Afficher les trois meilleures notes, avec le nom de l’étudiant et la matière.");
+
+    var top3 = notes.Join(
+      etudiants,
+      note => note.EtudiantId,
+      etudiant => etudiant.Id,
+      (note, etudiant) => new { etudiant.Nom, note.Matiere, note.Valeur })
+      .OrderByDescending(n => n.Valeur)
+      .Take(3);
+
+    foreach (var note in top3)
+    {
+      Console.WriteLine($"{note.Nom} {note.Matiere} {note.Valeur}");
+    }
+    
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
 
     //Partie 4 : lambdas imbriquées
+    
+    var gradeWithStudent = notes.Join(
+      etudiants,
+      note => note.EtudiantId,
+      etudiant => etudiant.Id,
+      (note, etudiant) => new { etudiant.Nom, etudiant.Filiere, note.Matiere, note.Valeur });
+    
+    //4.1 Afficher les étudiants qui n’ont aucune note.
+    Console.WriteLine("4.1 Afficher les étudiants qui n’ont aucune note.");
 
-    //Afficher les étudiants qui n’ont aucune note.
-    //Afficher tous les étudiants avec leur nombre de notes (Gaëlle doit apparaître avec 0), du plus grand nombre au plus petit.
-    //Afficher les étudiants qui ont au moins une note inférieure à 10.
+    var noGradedStudent = etudiants
+      .Where(e => !notes.Any(note => note.EtudiantId == e.Id)!);
+
+    foreach (var student in noGradedStudent)
+    {
+      Console.WriteLine($"{student.Nom}");
+    }
+    
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //4.2 Afficher tous les étudiants avec leur nombre de notes (Gaëlle doit apparaître avec 0), du plus grand nombre au plus petit.
+    Console.WriteLine("4.2 Afficher tous les étudiants avec leur nombre de notes (Gaëlle doit apparaître avec 0), du plus grand nombre au plus petit.");
+
+    var nbNotesParEtudiant = etudiants
+      .Select(e => new
+      {
+        e.Nom,
+        NbNotes = notes.Count(n => n.EtudiantId == e.Id)
+      })
+      .OrderByDescending(x => x.NbNotes);
+
+    foreach (var item in nbNotesParEtudiant)
+    {
+      Console.WriteLine($"{item.Nom} : {item.NbNotes}");
+    }
+    
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+    
+    //4.3 Afficher les étudiants qui ont au moins une note inférieure à 10.
+    Console.WriteLine("4.3 Afficher les étudiants qui ont au moins une note inférieure à 10.");
+
+    var etudiantsEnDifficulte = etudiants
+      .Where(e => notes.Any(n => n.EtudiantId == e.Id && n.Valeur < 10));
+
+    foreach (var etudiant in etudiantsEnDifficulte)
+    {
+      Console.WriteLine(etudiant.Nom);
+    }
+    
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
 
     //Partie 5 : SelectMany et doublons (sur la liste commentaires)
 
@@ -124,6 +349,7 @@ public class Recap
     //Défis
 
     //Afficher les noms de tous les étudiants de la filière qui a la meilleure moyenne de notes (celle de la question 15), triés par nom, y compris ceux sans note. Ça se fait en deux temps : d’abord la filière, ensuite les étudiants.
+
     //Afficher, pour chaque filière, le nom de l’étudiant qui a la meilleure moyenne. Tu devras calculer des moyennes par étudiant, puis regrouper par filière.
 
     //De quoi vérifier
