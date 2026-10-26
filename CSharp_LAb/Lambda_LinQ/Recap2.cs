@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices.JavaScript;
+using System.Security.Principal;
 
 namespace CSharp_LAb;
 
@@ -333,16 +334,149 @@ public class Recap2
     {
       Console.WriteLine($"{item.Nom}, {item.NbMovie}");
     }
-//Afficher les films qui ont reçu au moins un avis inférieur ou égal à 7.
-//Afficher les réalisateurs dont tous les films durent plus de 110 minutes. Avant de lancer le code, prédis le résultat pour Varda : un piège t’attend.
+    
+    Console.WriteLine("----------------------------------------------------------------------------------");
+    
+//4.3 Afficher les films qui ont reçu au moins un avis inférieur ou égal à 7.
+    Console.WriteLine("4.3 Afficher les films qui ont reçu au moins un avis inférieur ou égal à 7.");
+
+    var poorScore = films
+      .Where(f => avis.Any(a => a.FilmId == f.Id && a.Note <= 7));
+    
+    foreach (var item in poorScore)
+    {
+      Console.WriteLine($"{item.Titre}");
+    }
+    
+//4.4 Afficher les réalisateurs dont tous les films durent plus de 110 minutes. Avant de lancer le code, prédis le résultat pour Varda : un piège t’attend.
+    Console.WriteLine("4.4 Afficher les réalisateurs dont tous les films durent plus de 110 minutes. Avant de lancer le code, prédis le résultat pour Varda : un piège t’attend.");
+
+    var longestMovie2 = realisateurs
+      .Where(r => films.Where(f => f.RealisateurId == r.Id).All(f => f.Duree > 110));
+
+    foreach (var item in longestMovie2)
+    {
+      Console.WriteLine($"{item.Nom}");
+    }
+    
+    Console.WriteLine("----------------------------------------------------------------------------------");
+
 //Partie 5 : SelectMany (sur la liste critiques)
-//Afficher tous les mots, puis les mots sans doublon.
-//Afficher les mots qui apparaissent plusieurs fois.
-//Afficher le mot le plus fréquent, avec son nombre d’apparitions.
+
+//5.1 Afficher tous les mots, puis les mots sans doublon.
+    Console.WriteLine("5.1 Afficher tous les mots, puis les mots sans doublon.");
+
+    var anyWord = critiques.SelectMany(c => c.Split(' '));
+    Console.WriteLine(string.Join(" ", anyWord));
+    var word = critiques.SelectMany(c => c.Split(' '));
+    Console.WriteLine(string.Join(" ", word));
+    
+    Console.WriteLine("----------------------------------------------------------------------------------");
+    
+//5.2 Afficher les mots qui apparaissent plusieurs fois.
+    Console.WriteLine("5.2 Afficher les mots qui apparaissent plusieurs fois.");
+    
+    var anyWord2 = critiques
+      .SelectMany(c => c.Split(' '))
+      .GroupBy(c => c)
+      .Where(g => g.Count() > 1);
+
+    foreach (var item in anyWord2)
+    {
+      Console.WriteLine($"{item.Key}");
+    }
+    
+    Console.WriteLine("----------------------------------------------------------------------------------");
+    
+//5.3 Afficher le mot le plus fréquent, avec son nombre d’apparitions.
+    Console.WriteLine("5.3 Afficher le mot le plus fréquent, avec son nombre d’apparitions.");
+    
+    var anyWord3 = critiques.SelectMany(c => c.Split(' '))
+      .GroupBy(c => c)
+      .MaxBy(g => g.Count());
+
+    Console.WriteLine($"{anyWord3.Key} - {anyWord3.Count()}");
+    
+    Console.WriteLine("----------------------------------------------------------------------------------");
+    
 //Partie 6 : une Func
-//Écris une Func<decimal, string> nommée appreciation qui renvoie : "Mauvais" si la note est inférieure à 5, "Moyen" si elle est inférieure à 7, "Bon" si elle est inférieure à 9, "Excellent" sinon. Utilise-la pour afficher, pour chaque film qui a des avis, sa moyenne et son appréciation.
+
+//6.1 Écris une Func<decimal, string> nommée appreciation qui renvoie :
+//"Mauvais" si la note est inférieure à 5,
+//"Moyen" si elle est inférieure à 7,
+//"Bon" si elle est inférieure à 9,
+//"Excellent" sinon. Utilise-la pour afficher, pour chaque film qui a des avis, sa moyenne et son appréciation.
+
+    Func<decimal, string> appreciation = note =>
+    {
+      if (note < 5) return "Mauvais";
+      if (note < 7) return "Moyen";
+      if (note < 9) return "bon";
+
+      return "excellent";
+    };
+
+    var average = avis.Join(
+        films,
+        avis => avis.FilmId,
+        film => film.Id,
+        (avis1, film) => new { avis1.Note, film.Titre })
+      .GroupBy(nt => nt.Titre)
+      .Select(g => new { Titre = g.Key, Average = g.Average(x => x.Note) });
+
+    foreach (var item in average)
+    {
+      Console.WriteLine($"{item.Titre} - {item.Average:F2} - {appreciation(item.Average)}");
+    }
+    
+    Console.WriteLine("----------------------------------------------------------------------------------");
+    
 //Défis
-//Afficher, pour chaque genre, le film le mieux noté en moyenne, avec sa moyenne (deux niveaux de regroupement, comme le 7.2 de la série précédente).
-//Afficher la moyenne des avis par réalisateur, du mieux noté au moins bien noté. Il te faudra deux Join à la suite : le résultat du premier devient la première liste du second.
+
+//D.1 Afficher, pour chaque genre, le film le mieux noté en moyenne, avec sa moyenne (deux niveaux de regroupement, comme le 7.2 de la série précédente).
+    Console.WriteLine("D.1 Afficher, pour chaque genre, le film le mieux noté en moyenne, avec sa moyenne (deux niveaux de regroupement, comme le 7.2 de la série précédente).");
+
+    var bestCategoryAverage = avis.Join(
+        films,
+        unAvis => unAvis.FilmId,
+        film => film.Id,
+        (unAvis, film) => new { film.Titre, film.Genre, unAvis.Note })
+      .GroupBy(x => x.Titre)
+      .Select(g => new
+      {
+        Titre = g.Key,
+        Genre = g.First().Genre,
+        Average = g.Average(x => x.Note)
+      })
+      .GroupBy(f => f.Genre)
+      .Select(g => new { Genre = g.Key, Meilleur = g.MaxBy(f => f.Average) });
+
+    foreach (var item in bestCategoryAverage)
+    {
+      Console.WriteLine($"{item.Genre} : {item.Meilleur.Titre} ({item.Meilleur.Genre:F2})");
+    }
+    
+//D.2 Afficher la moyenne des avis par réalisateur, du mieux noté au moins bien noté. Il te faudra deux Join à la suite : le résultat du premier devient la première liste du second.
+    Console.WriteLine("D.2 Afficher la moyenne des avis par réalisateur, du mieux noté au moins bien noté. Il te faudra deux Join à la suite : le résultat du premier devient la première liste du second.");
+    
+    var directorAverage = realisateurs
+      .Join(
+        films,
+        realisateur => realisateur.Id,
+        film => film.RealisateurId,
+        (realisateur, film) => new { realisateur.Nom, FilmId = film.Id })
+      .Join(
+        avis,
+        ligne => ligne.FilmId,
+        unAvis => unAvis.FilmId,
+        (ligne, unAvis) => new { ligne.Nom, unAvis.Note })
+      .GroupBy(x => x.Nom)
+      .Select(g => new { Realisateur = g.Key, Moyenne = g.Average(x => x.Note) })
+      .OrderByDescending(x => x.Moyenne);
+    
+    foreach (var item in directorAverage)
+    {
+      Console.WriteLine($"{item.Realisateur} : {item.Moyenne:F2}");
+    }
   }
 }
