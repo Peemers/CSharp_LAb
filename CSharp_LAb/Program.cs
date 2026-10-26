@@ -17,6 +17,7 @@ while (true)
     case "5": Exo5.Run(); break;
     case "6": Exo6.Run(); break;
     case "7": Recap.Run(); break;
+    case "8": Recap2.Run(); break;
     case "q" : return ;
   }
 

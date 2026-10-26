@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Net.WebSockets;
+using System.Reflection;
 
 namespace CSharp_LAb;
 
@@ -258,17 +259,17 @@ public class Recap
     {
       Console.WriteLine($"{note.Meilleure.Nom} {note.Matiere} {note.Meilleure.Valeur}");
     }
-    
+
     Console.WriteLine("--------------------------------------------------------------------------------------------");
 
     //3.5 Afficher les trois meilleures notes, avec le nom de l’étudiant et la matière.
     Console.WriteLine("3.5 Afficher les trois meilleures notes, avec le nom de l’étudiant et la matière.");
 
     var top3 = notes.Join(
-      etudiants,
-      note => note.EtudiantId,
-      etudiant => etudiant.Id,
-      (note, etudiant) => new { etudiant.Nom, note.Matiere, note.Valeur })
+        etudiants,
+        note => note.EtudiantId,
+        etudiant => etudiant.Id,
+        (note, etudiant) => new { etudiant.Nom, note.Matiere, note.Valeur })
       .OrderByDescending(n => n.Valeur)
       .Take(3);
 
@@ -276,17 +277,17 @@ public class Recap
     {
       Console.WriteLine($"{note.Nom} {note.Matiere} {note.Valeur}");
     }
-    
+
     Console.WriteLine("--------------------------------------------------------------------------------------------");
 
     //Partie 4 : lambdas imbriquées
-    
+
     var gradeWithStudent = notes.Join(
       etudiants,
       note => note.EtudiantId,
       etudiant => etudiant.Id,
       (note, etudiant) => new { etudiant.Nom, etudiant.Filiere, note.Matiere, note.Valeur });
-    
+
     //4.1 Afficher les étudiants qui n’ont aucune note.
     Console.WriteLine("4.1 Afficher les étudiants qui n’ont aucune note.");
 
@@ -297,7 +298,7 @@ public class Recap
     {
       Console.WriteLine($"{student.Nom}");
     }
-    
+
     Console.WriteLine("--------------------------------------------------------------------------------------------");
 
     //4.2 Afficher tous les étudiants avec leur nombre de notes (Gaëlle doit apparaître avec 0), du plus grand nombre au plus petit.
@@ -315,9 +316,9 @@ public class Recap
     {
       Console.WriteLine($"{item.Nom} : {item.NbNotes}");
     }
-    
+
     Console.WriteLine("--------------------------------------------------------------------------------------------");
-    
+
     //4.3 Afficher les étudiants qui ont au moins une note inférieure à 10.
     Console.WriteLine("4.3 Afficher les étudiants qui ont au moins une note inférieure à 10.");
 
@@ -328,29 +329,120 @@ public class Recap
     {
       Console.WriteLine(etudiant.Nom);
     }
-    
+
     Console.WriteLine("--------------------------------------------------------------------------------------------");
 
     //Partie 5 : SelectMany et doublons (sur la liste commentaires)
 
-    //Afficher tous les mots des commentaires, puis les mots sans doublon.
-    //Afficher les mots qui apparaissent plusieurs fois (c’est la toute première fonction de notre conversation).
-    //Afficher le mot le plus fréquent avec son nombre d’apparitions.
+    //5.1 Afficher tous les mots des commentaires, puis les mots sans doublon.
+    Console.WriteLine("5.1 Afficher tous les mots des commentaires, puis les mots sans doublon.");
+
+    var anySentence = commentaires.SelectMany(c => c.Split(' '));
+    Console.WriteLine(string.Join(", ", anySentence));
+
+    var onlyWord = anySentence.Distinct();
+    Console.WriteLine(string.Join(", ", onlyWord));
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //5.2 Afficher les mots qui apparaissent plusieurs fois (c’est la toute première fonction de notre conversation).
+    Console.WriteLine("5.2 Afficher les mots qui apparaissent plusieurs fois (c’est la toute première fonction de notre conversation).");
+
+    var wordOnly = commentaires.SelectMany(c => c.Split(' '))
+      .GroupBy(w => w)
+      .Where(w => w.Count() > 1);
+
+    foreach (var word in wordOnly)
+    {
+      Console.WriteLine(word.Key);
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+    //5.3 Afficher le mot le plus fréquent avec son nombre d’apparitions.
+    Console.WriteLine("5.3 Afficher le mot le plus fréquent avec son nombre d’apparitions.");
+
+    var mostCommon = commentaires.SelectMany(c => c.Split(' '))
+      .GroupBy(w => w)
+      .MaxBy(g => g.Count());
+
+    Console.WriteLine($"{mostCommon.Key} - {mostCommon.Count()}");
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
 
     //Partie 6 : stocker une lambda dans une variable
 
-    //Écris une Func<decimal, string> nommée mention qui renvoie :
+    //6.1 Écris une Func<decimal, string> nommée mention qui renvoie :
     //"Insuffisant" si la note est inférieure à 10,
     //"Passable" si elle est inférieure à 14,
     //"Bien" si elle est inférieure à 16,
     //"Très bien" sinon.
     //Utilise-la pour afficher, pour chaque étudiant qui a des notes, sa moyenne et sa mention.
 
+    Func<decimal, string> mention = note =>
+    {
+      if (note < 10) return "insuffisant";
+      if (note < 14) return "passable";
+      if (note < 18) return "Bien";
+      return "très bien";
+    };
+
+    var average = notes
+      .Join(etudiants,
+        note => note.EtudiantId,
+        etudiant => etudiant.Id,
+        (note, etudiant) => new { etudiant.Nom, note.Valeur })
+      .GroupBy(x => x.Nom)
+      .Select(g => new { Name = g.Key, Average = g.Average(x => x.Valeur) });
+
+    foreach (var item in average)
+    {
+      Console.WriteLine($"{item.Name} : {item.Average:F2} - {mention(item.Average)}");
+    }
+
+    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
     //Défis
 
-    //Afficher les noms de tous les étudiants de la filière qui a la meilleure moyenne de notes (celle de la question 15), triés par nom, y compris ceux sans note. Ça se fait en deux temps : d’abord la filière, ensuite les étudiants.
+    //7.1 Afficher les noms de tous les étudiants de la filière qui a la meilleure moyenne de notes (celle de la question 15), triés par nom, y compris ceux sans note. Ça se fait en deux temps : d’abord la filière, ensuite les étudiants.
+    Console.WriteLine(
+      "7.1 Afficher les noms de tous les étudiants de la filière qui a la meilleure moyenne de notes (celle de la question 15), triés par nom, y compris ceux sans note. Ça se fait en deux temps : d’abord la filière, ensuite les étudiants.");
 
-    //Afficher, pour chaque filière, le nom de l’étudiant qui a la meilleure moyenne. Tu devras calculer des moyennes par étudiant, puis regrouper par filière.
+    var bestSectorAverage = notes
+      .Join(etudiants,
+        note => note.EtudiantId,
+        etudiant => etudiant.Id,
+        (note, etudiant) => new { etudiant.Filiere, note.Valeur })
+      .GroupBy(fv => fv.Filiere)
+      .MaxBy(g => g.Average(x => x.Valeur));
+
+    var student2 = etudiants
+      .Where(e => e.Filiere == bestSectorAverage.Key)
+      .OrderBy(e => e.Nom)
+      .Select(e => e.Nom);
+    
+    foreach (var student in student2)
+    {
+      Console.WriteLine(student);
+    };
+
+    //7.2 Afficher, pour chaque filière, le nom de l’étudiant qui a la meilleure moyenne. Tu devras calculer des moyennes par étudiant, puis regrouper par filière.
+    Console.WriteLine("7.2 Afficher, pour chaque filière, le nom de l’étudiant qui a la meilleure moyenne. Tu devras calculer des moyennes par étudiant, puis regrouper par filière.");
+    var individualBestSectorAverage = notes
+      .Join(etudiants,
+        note => note.EtudiantId,
+        etudiant => etudiant.Id,
+        (note, etudiant) => new { etudiant.Filiere, etudiant.Nom, note.Valeur })
+      .GroupBy(x => x.Nom)
+      .Select(e => new {Nom = e.Key, Filiere = e.First().Filiere, Moyenne = e.Average(e => e.Valeur) })
+      .GroupBy(e => e.Filiere)
+      .Select(g => new { Filiere = g.Key, Meilleur = g.MaxBy(e => e.Moyenne) });
+
+    foreach (var item in individualBestSectorAverage)
+    {
+      Console.WriteLine($"{item.Filiere} : {item.Meilleur.Nom} ({item.Meilleur.Moyenne:F2})");
+    }
 
     //De quoi vérifier
     //1 : Emma, Bob, Chloé, Gaëlle (dans cet ordre).
